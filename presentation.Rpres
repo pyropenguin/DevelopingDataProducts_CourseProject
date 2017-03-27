@@ -1,0 +1,68 @@
+Weather Data by Airport
+========================================================
+author: Jonathan Kunze
+date: March 26, 2017
+autosize: true
+
+Developing Data Products 
+
+Course Project
+
+Data
+========================================================
+
+In July of 2015, the data journalism blog FiveThirtyEight posted an article entitled ['What 12 Months of Record-Setting Temperatures Looks Like Across the U.S.'](https://fivethirtyeight.com/features/what-12-months-of-record-setting-temperatures-looks-like-across-the-u-s/) The data used for this article was [posted on GitHub](https://github.com/fivethirtyeight/data/tree/master/us-weather-history) in their data repository and made publically available.
+
+The interesting thing about this dataset was that it contained daily mean, high and low temperatures for a number of US cities (split by airport), along with record high and low temperatures for each day.
+
+Analysis
+========================================================
+
+The purpose of this project was to make this data visually accessible using a simple  interactive drop-down. The user can select a city (by airport) to view the difference between daily high and low temperatures and record high and low temperatures.
+
+Large differences between high and record high or low and record low show relatively moderate weather. Record-setting days are indicated by no line between a high/record high or low/record low. Mean temperature is drawn as a line for reference.
+
+The application uses the Shiny framework, with a ui.R file generating the reactive HTML page and a server.R file performing calculations and generating the output.
+
+Client/Server Interaction
+========================================================
+On the server side, a subset calculaiton is performed using the airport selected by the user on the weather data and a plot is produced. The plot is then returned to output$tempPlot to be shown in the UI.
+
+```{r, eval=FALSE}
+# Define server logic required to draw the temperature data plots
+shinyServer(function(input, output) {
+  output$tempPlot <- renderPlot({
+    # Use the airport dropdown input to subset the data and compute the graph
+    wx_sub <- wx[airport==input$airport]
+    g <- ggplot(wx_sub, aes(x=date))
+    # Omitted for brevity. Evaluated output on next page.
+    return(g)
+```
+
+Example Output: Phoenix (KPHX)
+========================================================
+
+```{r, echo=FALSE, fig.height=5, fig.width=15}
+library(ggplot2)
+library(data.table)
+load('WeatherData.Rda')
+sel.airport <- 'KPHX'
+
+g <- ggplot(wx[airport==sel.airport], aes(x=date))
+g <- g + geom_line(aes(y=actual_mean_temp))
+g <- g + geom_point(aes(y=record_min_temp), color='blue', size=1)
+g <- g + geom_point(aes(y=record_max_temp), color='red', size=1)
+g <- g + geom_point(aes(y=actual_min_temp), color='blue', size=1, alpha=0.1)
+g <- g + geom_point(aes(y=actual_max_temp), color='red', size=1, alpha=0.1)
+g <- g + geom_segment(aes(y=actual_min_temp, yend=record_min_temp, 
+                          x=date, xend=date, 
+                      color=ifelse(actual_min_temp > record_min_temp,'Record Low','Normal')))
+g <- g + geom_segment(aes(y=actual_max_temp, yend=record_max_temp, 
+                          x=date, xend=date,
+                      color=ifelse(actual_max_temp < record_max_temp,'Record High','Normal')))
+g <- g + scale_colour_manual(values = setNames(c('blue','grey','red'),c('Record Low','Normal','Record High')))
+g <- g + labs(title=paste('Mean, Max and Min Temperatures for', sel.airport),
+              x='Date', y='Temperature (°F)')
+g <- g + theme(legend.position="none")
+g
+```

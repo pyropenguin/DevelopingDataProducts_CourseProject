@@ -1,0 +1,11 @@
+name: DevelopingDataProducts_CourseProject
+title: DevelopingDataProducts_CourseProject
+account: pyropenguin
+server: shinyapps.io
+appId: 167360
+bundleId: 764442
+url: https://pyropenguin.shinyapps.io/DevelopingDataProducts_CourseProject/
+when: 1490572762.04567
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: presentation.md|presentation.Rpres|sandbox.R|WeatherData.Rda|presentation-figure/unnamed-chunk-1-1.png|presentation-figure/unnamed-chunk-2-1.png|us-weather-history/visualize_weather.py|us-weather-history/wunderground_parser.py|us-weather-history/wunderground_scraper.py
